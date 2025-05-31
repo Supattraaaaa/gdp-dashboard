@@ -1,0 +1,40 @@
+# app.py
+import streamlit as st
+import pandas as pd
+from sklearn.ensemble import RandomForestRegressor
+
+# Prepare data
+data = {
+    "1st ly": [12.6]*11,
+    "2nd ly": [3.4]*11,
+    "3rd ly": [0.115]*11,
+    "4th ly": [0.385]*11,
+    "5th ly": [24.5]*11,
+    "6th ly": [0.115]*11,
+    "7th ly": [0.48]*11,
+    "8th ly": [0.235]*11,
+    "Vacuum": [610, 610, 620, 620, 620, 620, 625, 630, 630, 640, 640],
+    "Color": [476.72, 478.66, 479.78, 477.07, 476.85, 478.66, 478.64, 476.17, 476.44, 475.34, 474.64]
+}
+df = pd.DataFrame(data)
+
+# Features/Target
+X = df.drop(columns="Color")
+y = df["Color"]
+
+# Train model
+model = RandomForestRegressor()
+model.fit(X, y)
+
+# UI
+st.title("🎨 Predict Color from Layer & Vacuum")
+st.markdown("ป้อนค่าต่าง ๆ เพื่อทำนายค่า Color")
+
+user_input = {}
+for col in X.columns:
+    user_input[col] = st.number_input(col, value=float(X[col].mean()), format="%.4f")
+
+input_df = pd.DataFrame([user_input])
+prediction = model.predict(input_df)[0]
+
+st.success(f"🔮 Predicted Color: **{prediction:.2f}**")
